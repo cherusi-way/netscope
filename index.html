@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NetScope">
+<meta name="theme-color" content="#06090f">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==">
+<title>NetScope Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --bg:#06090f;--surf:#0c1221;--bdr:#1a2f4a;--bdr-s:rgba(26,47,74,.5);
+  --acc:#3b9eff;--acc-d:rgba(59,158,255,.12);
+  --good:#22d3a5;--warn:#f59e0b;--bad:#ef4444;--info:#a78bfa;
+  --txt:#dde5f0;--mid:#7a90ab;--dim:#3d5268;
+  --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Exo 2','Hiragino Sans','Noto Sans JP',sans-serif;min-height:100vh;padding-bottom:52px;-webkit-font-smoothing:antialiased}
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:20;background:rgba(6,9,15,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.app-n{font-weight:800;font-size:20px;letter-spacing:-.03em;background:linear-gradient(120deg,#e8f4ff,var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.app-s{font-size:9px;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;margin-top:1px}
+.btn-r{background:var(--acc-d);border:1px solid rgba(59,158,255,.28);color:var(--acc);padding:8px 15px;border-radius:9px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
+.btn-r:active{opacity:.65;transform:scale(.96)}
+/* STRIP */
+.strip{margin:14px 15px 0;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.signal{display:flex;align-items:flex-end;gap:3px;flex-shrink:0}
+.sb{width:5px;border-radius:2px;background:var(--dim);transition:background .3s}
+.sb:nth-child(1){height:7px}.sb:nth-child(2){height:12px}.sb:nth-child(3){height:17px}.sb:nth-child(4){height:22px}
+.sb.on{background:var(--good);box-shadow:0 0 6px rgba(34,211,165,.4)}.sb.med{background:var(--warn)}.sb.low{background:var(--bad)}
+.si{flex:1;min-width:0}
+.sq{font-size:15px;font-weight:700;line-height:1;margin-bottom:4px}
+.sd{font-size:11px;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sip{text-align:right;flex-shrink:0}
+.sipl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px}
+.sipv{font-family:var(--mono);font-size:12px;color:var(--acc);font-weight:600}
+/* CARDS */
+.content{padding:12px 15px 0;display:flex;flex-direction:column;gap:11px}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;animation:cin .35s ease both}
+@keyframes cin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card:nth-child(1){animation-delay:.03s}.card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.09s}.card:nth-child(4){animation-delay:.12s}.card:nth-child(5){animation-delay:.15s}.card:nth-child(6){animation-delay:.18s}.card:nth-child(7){animation-delay:.21s}.card:nth-child(8){animation-delay:.24s}.card:nth-child(9){animation-delay:.27s}.card:nth-child(10){animation-delay:.30s}.card:nth-child(11){animation-delay:.33s}.card:nth-child(12){animation-delay:.36s}.card:nth-child(13){animation-delay:.39s}
+.ch{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bdr)}
+.ci{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.n{background:rgba(59,158,255,.12)}.ip{background:rgba(167,139,250,.12)}.wh{background:rgba(251,191,36,.12)}.cf{background:rgba(249,115,22,.12)}.sp{background:rgba(34,211,165,.12)}.tm{background:rgba(96,165,250,.12)}.dv{background:rgba(245,158,11,.12)}.sc{background:rgba(236,72,153,.12)}.bt{background:rgba(74,222,128,.12)}.st{background:rgba(99,102,241,.12)}.md{background:rgba(52,211,153,.12)}.en{background:rgba(167,139,250,.12)}.au{background:rgba(250,204,21,.12)}
+.ct{font-weight:700;font-size:13px;flex:1}
+.bdg{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:6px;font-weight:600;letter-spacing:.04em}
+.bg-g{background:rgba(34,211,165,.12);color:var(--good)}.bg-w{background:rgba(245,158,11,.12);color:var(--warn)}.bg-b{background:rgba(239,68,68,.12);color:var(--bad)}.bg-i{background:rgba(167,139,250,.12);color:var(--info)}.bg-d{background:rgba(61,82,104,.28);color:var(--mid)}
+/* ROWS */
+.rows{padding:4px 0}
+.row{display:flex;align-items:baseline;justify-content:space-between;padding:8px 16px;gap:10px;border-bottom:1px solid var(--bdr-s)}
+.row:last-child{border-bottom:none}
+.row:active{background:rgba(59,158,255,.04)}
+.rl{font-size:11.5px;color:var(--mid);flex-shrink:0;line-height:1.4}
+.rv{font-family:var(--mono);font-size:11.5px;font-weight:600;text-align:right;word-break:break-all;line-height:1.4}
+.rv.g{color:var(--good)}.rv.w{color:var(--warn)}.rv.b{color:var(--bad)}.rv.i{color:var(--info)}.rv.a{color:var(--acc)}.rv.d{color:var(--mid)}
+.row.full{flex-direction:column;gap:4px}
+.row.full .rv{text-align:left;font-size:10.5px;font-weight:400;color:var(--mid);word-break:break-word}
+/* LOADING */
+.ld span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--dim);animation:bk 1.2s ease-in-out infinite;vertical-align:middle;margin:0 1px}
+.ld span:nth-child(2){animation-delay:.2s}.ld span:nth-child(3){animation-delay:.4s}
+@keyframes bk{0%,100%{opacity:.25}50%{opacity:1}}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--dim);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:4px}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* SPEED */
+.spd-a{padding:14px 16px}
+.spd-t{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.spd-f{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--good),var(--acc));transition:width .9s cubic-bezier(.34,1.56,.64,1);width:0%}
+.spd-r{display:flex;align-items:baseline;gap:4px;margin-bottom:14px}
+.spd-n{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--txt);line-height:1}
+.spd-u{font-size:13px;color:var(--mid)}
+.spd-h{font-size:11px;color:var(--dim);margin-left:8px}
+.btn-s{width:100%;padding:11px;background:var(--acc-d);border:1px solid rgba(59,158,255,.28);border-radius:10px;color:var(--acc);font-family:'Exo 2',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;cursor:pointer}
+.btn-s:active{opacity:.7}.btn-s:disabled{opacity:.45;cursor:not-allowed}
+/* BATTERY */
+.bat-v{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bdr-s)}
+.bat-b{width:46px;height:21px;border:2px solid var(--mid);border-radius:4px;position:relative;flex-shrink:0}
+.bat-b::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);width:3px;height:9px;background:var(--mid);border-radius:0 2px 2px 0}
+.bat-f{position:absolute;inset:2px;right:auto;width:0%;border-radius:1px;background:var(--good);transition:width .8s ease,background .3s}
+.bat-p{font-family:var(--mono);font-size:15px;font-weight:600}
+.bat-s{font-size:11px;color:var(--mid);margin-top:2px}
+/* STORAGE BAR */
+.sto-w{padding:12px 16px;border-bottom:1px solid var(--bdr-s)}
+.sto-l{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mid);margin-bottom:7px}
+.sto-t{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.sto-f{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--info));transition:width .8s ease;width:0%}
+/* FOOTER */
+.footer{margin:18px 15px 0;text-align:center;font-size:10px;color:var(--dim);letter-spacing:.07em;line-height:2}
+/* INSTALL BAR */
+.ibar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(12,18,33,.97);border-top:1px solid var(--bdr);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 16px 20px;display:flex;align-items:center;gap:12px;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.2,.64,1)}
+.ibar.show{transform:translateY(0)}
+.ibar-icon{width:44px;height:44px;border-radius:11px;flex-shrink:0;border:1px solid var(--bdr)}
+.ibar-txt{flex:1;min-width:0}
+.ibar-ttl{font-weight:700;font-size:13px;line-height:1.2}
+.ibar-sub{font-size:11px;color:var(--mid);margin-top:3px}
+.ibar-btn{background:var(--acc-d);border:1px solid rgba(59,158,255,.35);color:var(--acc);padding:9px 15px;border-radius:9px;font-family:'Exo 2',sans-serif;font-weight:700;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .15s}
+.ibar-btn:active{opacity:.7}
+.ibar-x{color:var(--dim);font-size:20px;cursor:pointer;flex-shrink:0;padding:4px;line-height:1;margin-left:-4px}
+/* iOS hint banner */
+.ios-hint{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(12,18,33,.97);border-top:1px solid var(--bdr);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:14px 18px 24px;transform:translateY(100%);transition:transform .35s cubic-bezier(.34,1.2,.64,1)}
+.ios-hint.show{transform:translateY(0)}
+.ios-hint-ttl{font-weight:700;font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.ios-hint-body{font-size:12px;color:var(--mid);line-height:1.7}
+.ios-hint-body span{color:var(--acc);font-weight:600}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div><div class="app-n">NetScope Pro</div><div class="app-s">Network Diagnostics</div></div>
+  <button class="btn-r" onclick="runAll()">↻ 再診断</button>
+</header>
+
+<div class="strip">
+  <div class="signal" id="sig"><div class="sb"></div><div class="sb"></div><div class="sb"></div><div class="sb"></div></div>
+  <div class="si"><div class="sq" id="s-qual">診断中...</div><div class="sd" id="s-det">情報を収集しています</div></div>
+  <div class="sip"><div class="sipl">Public IP</div><div class="sipv" id="s-ip">—</div></div>
+</div>
+
+<div class="content">
+
+<!-- ① ネットワーク回線 -->
+<div class="card">
+  <div class="ch"><div class="ci n">📶</div><div class="ct">ネットワーク回線</div><span class="bdg bg-d" id="bdg-net">—</span></div>
+  <div class="rows">
+    <div class="row"><span class="rl">回線種別</span><span class="rv d" id="r-type"><span class="ld"><span></span><span></span><span></span></span></span></div>
+    <div class="row"><span class="rl">実効速度クラス</span><span class="rv d" id="r-et">—</span></div>
+    <div class="row"><span class="rl">推定ダウンリンク</span><span class="rv d" id="r-dl">—</span></div>
+    <div class="row"><span class="rl">最大帯域 (規格値)</span><span class="rv d" id="r-dlmax">—</span></div>
+    <div class="row"><span class="rl">RTT 推定遅延</span><span class="rv d" id="r-rtt">—</span></div>
+    <div class="row"><span class="rl">省データモード</span><span class="rv d" id="r-save">—</span></div>
+    <div class="row"><span class="rl">接続状態</span><span class="rv d" id="r-online">—</span></div>
+  </div>
+</div>
+
+<!-- ② IP・ISP情報 -->
+<div class="card">
+  <div class="ch"><div class="ci ip">🌐</div><div class="ct">IPアドレス・ISP情報</div><span class="bdg bg-d" id="bdg-ip">取得中</span></div>
+  <div class="rows">
+    <div class="row"><span class="rl">パブリック IP</span><span class="rv a" id="r-pub"><span class="spin"></span></span></div>
+    <div class="row"><span class="rl">プライベート IP (LAN)</span><span class="rv d" id="r-lan">取得中...</span></div>
+    <div class="row"><span class="rl">IP タイプ</span><span class="rv d" id="r-iptyp">—</span></div>
+    <div class="row"><span class="rl">IPv6 接続</span><span class="rv d" id="r-ipv6">確認中...</span></div>
+    <div class="row"><span class="rl">ISP</span><span class="rv d" id="r-isp">—</span></div>
+    <div class="row"><span class="rl">組織名</span><span class="rv d" id="r-org">—</span></div>
+    <div class="row"><span class="rl">AS 番号</span><span class="rv d" id="r-asn">—</span></div>
+    <div class="row"><span class="rl">ドメイン</span><span class="rv d" id="r-dom">—</span></div>
+    <div class="row"><span class="rl">国 / 地域</span><span class="rv d" id="r-country">—</span></div>
+    <div class="row"><span class="rl">都市</span><span class="rv d" id="r-city">—</span></div>
+    <div class="row"><span class="rl">タイムゾーン</span><span class="rv d" id="r-tz">—</span></div>
+  </div>
+</div>
+
+<!-- ③ WHOIS / RDAP -->
+<div class="card">
+  <div class="ch"><div class="ci wh">🔍</div><div class="ct">WHOIS / RDAP</div><span class="bdg bg-d" id="bdg-rdap">取得中</span></div>
+  <div class="rows">
+    <div class="row"><span class="rl">ネットワーク範囲 (CIDR)</span><span class="rv d" id="r-cidr"><span class="spin"></span></span></div>
+    <div class="row"><span class="rl">ネットワーク名</span><span class="rv d" id="r-netname">—</span></div>
+    <div class="row"><span class="rl">ハンドル</span><span class="rv d" id="r-handle">—</span></div>
+    <div class="row"><span class="rl">タイプ</span><span class="rv d" id="r-nettype">—</span></div>
+    <div class="row"><span class="rl">RIR</span><span class="rv d" id="r-rir">—</span></div>
+    <div class="row"><span class="rl">登録組織</span><span class="rv d" id="r-rdaporg">—</span></div>
+    <div class="row"><span class="rl">登録日</span><span class="rv d" id="r-regdate">—</span></div>
+    <div class="row"><span class="rl">最終更新</span><span class="rv d" id="r-upddate">—</span></div>
+    <div class="row"><span class="rl">AS 番号 (RDAP)</span><span class="rv d" id="r-rdapasn">—</span></div>
+    <div class="row"><span class="rl">AS 名</span><span class="rv d" id="r-rdapasname">—</span></div>
+    <div class="row"><span class="rl">WHOIS サーバー</span><span class="rv d" id="r-port43">—</span></div>
+  </div>
+</div>
+
+<!-- ④ Cloudflare トレース -->
+<div class="card">
+  <div class="ch"><div class="ci cf">☁️</div><div class="ct">Cloudflare トレース</div><span class="bdg bg-d" id="bdg-cf">取得中</span></div>
+  <div class="rows">
+    <div class="row"><span class="rl">HTTP バージョン</span><span class="rv d" id="r-http"><span class="spin"></span></span></div>
+    <div class="row"><span class="rl">TLS バージョン</span><span class="rv d" id="r-tls">—</span></div>
+    <div class="row"><span class="rl">鍵交換アルゴリズム</span><span class="rv d" id="r-kex">—</span></div>
+    <div class="row"><span class="rl">SNI 暗号化</span><span class="rv d" id="r-sni">—</span></div>
+    <div class="row"><span class="rl">最寄り CF データセンター</span><span class="rv d" id="r-colo">—</span></div>
+    <div class="row"><span class="rl">確認国コード</span><span class="rv d" id="r-cfloc">—</span></div>
+    <div class="row"><span class="rl">Cloudflare WARP</span><span class="rv d" id="r-warp">—</span></div>
+    <div class="row"><span class="rl">CF Gateway (Zero Trust)</span><span class="rv d" id="r-gw">—</span></div>
+  </div>
+</div>
+
+<!-- ⑤ 速度テスト -->
+<div class="card">
+  <div class="ch"><div class="ci sp">⚡</div><div class="ct">速度テスト</div><span class="bdg bg-d" id="bdg-spd">未実施</span></div>
+  <div class="spd-a">
+    <div class="spd-t"><div class="spd-f" id="spd-fill"></div></div>
+    <div class="spd-r">
+      <span class="spd-n" id="spd-num">—</span>
+      <span class="spd-u">Mbps</span>
+      <span class="spd-h" id="spd-hint">ボタンを押して計測</span>
+    </div>
+    <button class="btn-s" id="btn-spd" onclick="runSpeed()">ダウンロード速度を計測</button>
+  </div>
+  <div class="rows" id="spd-rows" style="display:none">
+    <div class="row"><span class="rl">取得サイズ</span><span class="rv d" id="r-ssize">—</span></div>
+    <div class="row"><span class="rl">所要時間</span><span class="rv d" id="r-stime">—</span></div>
+    <div class="row"><span class="rl">実測 RTT</span><span class="rv d" id="r-srtt">—</span></div>
+  </div>
+</div>
+
+<!-- ⑥ 接続詳細 / Performance Timing -->
+<div class="card">
+  <div class="ch"><div class="ci tm">⏱</div><div class="ct">接続詳細 / ページ Timing</div></div>
+  <div class="rows">
+    <div class="row"><span class="rl">DNS 解決時間</span><span class="rv d" id="r-dns">—</span></div>
+    <div class="row"><span class="rl">TCP 接続時間</span><span class="rv d" id="r-tcp">—</span></div>
+    <div class="row"><span class="rl">TLS ハンドシェイク</span><span class="rv d" id="r-tlst">—</span></div>
+    <div class="row"><span class="rl">TTFB (初回バイト到達)</span><span class="rv d" id="r-ttfb">—</span></div>
+    <div class="row"><span class="rl">DOM 読み込み完了</span><span class="rv d" id="r-domload">—</span></div>
+    <div class="row"><span class="rl">JS ヒープ使用量</span><span class="rv d" id="r-heap">—</span></div>
+    <div class="row"><span class="rl">JS ヒープ上限</span><span class="rv d" id="r-heaplim">—</span></div>
+  </div>
+</div>
+
+<!-- ⑦ デバイス情報 -->
+<div class="card">
+  <div class="ch"><div class="ci dv">📱</div><div class="ct">デバイス情報</div></div>
+  <div class="rows">
+    <div class="row"><span class="rl">デバイスモデル</span><span class="rv d" id="r-model">—</span></div>
+    <div class="row"><span class="rl">OS / バージョン</span><span class="rv d" id="r-os">—</span></div>
+    <div class="row"><span class="rl">プラットフォーム</span><span class="rv d" id="r-plat">—</span></div>
+    <div class="row"><span class="rl">CPU コア数</span><span class="rv d" id="r-cores">—</span></div>
+    <div class="row"><span class="rl">デバイスメモリ</span><span class="rv d" id="r-mem">—</span></div>
+    <div class="row"><span class="rl">タッチポイント数</span><span class="rv d" id="r-touch">—</span></div>
+    <div class="row"><span class="rl">GPU (WebGL)</span><span class="rv d" id="r-gpu">—</span></div>
+    <div class="row"><span class="rl">WebGL 2.0</span><span class="rv d" id="r-webgl2">—</span></div>
+    <div class="row"><span class="rl">WebGPU</span><span class="rv d" id="r-webgpu">—</span></div>
+    <div class="row"><span class="rl">WebAssembly</span><span class="rv d" id="r-wasm">—</span></div>
+    <div class="row full"><span class="rl">User Agent</span><span class="rv" id="r-ua">—</span></div>
+  </div>
+</div>
+
+<!-- ⑧ 画面情報 -->
+<div class="card">
+  <div class="ch"><div class="ci sc">🖥</div><div class="ct">画面情報</div></div>
+  <div class="rows">
+    <div class="row"><span class="rl">物理解像度</span><span class="rv d" id="r-phys">—</span></div>
+    <div class="row"><span class="rl">論理解像度 (CSS px)</span><span class="rv d" id="r-logi">—</span></div>
+    <div class="row"><span class="rl">ピクセル比 (DPR)</span><span class="rv d" id="r-dpr">—</span></div>
+    <div class="row"><span class="rl">向き</span><span class="rv d" id="r-ori">—</span></div>
+    <div class="row"><span class="rl">色深度</span><span class="rv d" id="r-depth">—</span></div>
+    <div class="row"><span class="rl">HDR 対応</span><span class="rv d" id="r-hdr">—</span></div>
+    <div class="row"><span class="rl">カラーガモット</span><span class="rv d" id="r-gamut">—</span></div>
+    <div class="row"><span class="rl">有効領域 (通知バー除く)</span><span class="rv d" id="r-avail">—</span></div>
+    <div class="row"><span class="rl">ウィンドウ全体サイズ</span><span class="rv d" id="r-outer">—</span></div>
+  </div>
+</div>
+
+<!-- ⑨ バッテリー -->
+<div class="card">
+  <div class="ch"><div class="ci bt">🔋</div><div class="ct">バッテリー</div><span class="bdg bg-d" id="bdg-bat">—</span></div>
+  <div class="bat-v">
+    <div class="bat-b"><div class="bat-f" id="bat-f"></div></div>
+    <div><div class="bat-p" id="bat-p">—</div><div class="bat-s" id="bat-s">取得中...</div></div>
+  </div>
+  <div class="rows">
+    <div class="row"><span class="rl">充電状態</span><span class="rv d" id="r-chrg">—</span></div>
+    <div class="row"><span class="rl">充電完了まで</span><span class="rv d" id="r-ctime">—</span></div>
+    <div class="row"><span class="rl">放電完了まで</span><span class="rv d" id="r-dtime">—</span></div>
+  </div>
+</div>
+
+<!-- ⑩ ストレージ -->
+<div class="card">
+  <div class="ch"><div class="ci st">💾</div><div class="ct">ストレージ（ブラウザ割当）</div></div>
+  <div class="sto-w">
+    <div class="sto-l"><span id="sto-u">使用中: —</span><span id="sto-t">合計: —</span></div>
+    <div class="sto-t"><div class="sto-f" id="sto-f"></div></div>
+  </div>
+  <div class="rows">
+    <div class="row"><span class="rl">使用量</span><span class="rv d" id="r-stou">—</span></div>
+    <div class="row"><span class="rl">割当容量</span><span class="rv d" id="r-stoq">—</span></div>
+    <div class="row"><span class="rl">使用率</span><span class="rv d" id="r-stop">—</span></div>
+    <div class="row"><span class="rl">ストレージ永続化許可</span><span class="rv d" id="r-persist">—</span></div>
+    <div class="row"><span class="rl">IndexedDB</span><span class="rv d" id="r-idb">—</span></div>
+    <div class="row"><span class="rl">localStorage</span><span class="rv d" id="r-ls">—</span></div>
+    <div class="row"><span class="rl">sessionStorage</span><span class="rv d" id="r-ss">—</span></div>
+    <div class="row"><span class="rl">CacheStorage (SW)</span><span class="rv d" id="r-cs">—</span></div>
+  </div>
+</div>
+
+<!-- ⑪ メディア・権限 -->
+<div class="card">
+  <div class="ch"><div class="ci md">🎙</div><div class="ct">メディアデバイス・権限</div></div>
+  <div class="rows">
+    <div class="row"><span class="rl">カメラ台数</span><span class="rv d" id="r-cams">—</span></div>
+    <div class="row"><span class="rl">マイク台数</span><span class="rv d" id="r-mics">—</span></div>
+    <div class="row"><span class="rl">スピーカー数</span><span class="rv d" id="r-spks">—</span></div>
+    <div class="row"><span class="rl">Geolocation 許可</span><span class="rv d" id="r-pgeo">—</span></div>
+    <div class="row"><span class="rl">カメラ 許可</span><span class="rv d" id="r-pcam">—</span></div>
+    <div class="row"><span class="rl">マイク 許可</span><span class="rv d" id="r-pmic">—</span></div>
+    <div class="row"><span class="rl">通知 許可</span><span class="rv d" id="r-pnot">—</span></div>
+    <div class="row"><span class="rl">クリップボード読取</span><span class="rv d" id="r-pcbr">—</span></div>
+    <div class="row"><span class="rl">クリップボード書込</span><span class="rv d" id="r-pcbw">—</span></div>
+  </div>
+</div>
+
+<!-- ⑫ ブラウザ・センサー・環境 -->
+<div class="card">
+  <div class="ch"><div class="ci en">⚙️</div><div class="ct">ブラウザ・センサー・環境</div></div>
+  <div class="rows">
+    <div class="row"><span class="rl">ブラウザ</span><span class="rv d" id="r-brow">—</span></div>
+    <div class="row"><span class="rl">言語設定</span><span class="rv d" id="r-lang">—</span></div>
+    <div class="row"><span class="rl">Cookie</span><span class="rv d" id="r-cookie">—</span></div>
+    <div class="row"><span class="rl">Do Not Track</span><span class="rv d" id="r-dnt">—</span></div>
+    <div class="row"><span class="rl">ダークモード</span><span class="rv d" id="r-dark">—</span></div>
+    <div class="row"><span class="rl">省アニメーション</span><span class="rv d" id="r-motion">—</span></div>
+    <div class="row"><span class="rl">ジャイロ / 加速度センサー</span><span class="rv d" id="r-gyro">—</span></div>
+    <div class="row"><span class="rl">Vibration API</span><span class="rv d" id="r-vib">—</span></div>
+    <div class="row"><span class="rl">Bluetooth API</span><span class="rv d" id="r-bt">—</span></div>
+    <div class="row"><span class="rl">Service Worker</span><span class="rv d" id="r-sw">—</span></div>
+    <div class="row"><span class="rl">自動化ツール (WebDriver)</span><span class="rv d" id="r-wd">—</span></div>
+    <div class="row"><span class="rl">PWA / スタンドアロン</span><span class="rv d" id="r-pwa">—</span></div>
+    <div class="row"><span class="rl">PDF ビューア内蔵</span><span class="rv d" id="r-pdf">—</span></div>
+    <div class="row"><span class="rl">Keyboard Layout API</span><span class="rv d" id="r-kbd">—</span></div>
+    <div class="row"><span class="rl">Geolocation API</span><span class="rv d" id="r-geo">—</span></div>
+    <div class="row"><span class="rl">診断日時</span><span class="rv d" id="r-ts">—</span></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ⑬ Audio Context -->
+<div class="content" style="padding-top:0">
+<div class="card">
+  <div class="ch"><div class="ci au">🔊</div><div class="ct">Audio Context</div><span class="bdg bg-d" id="bdg-audio">—</span></div>
+  <div class="rows">
+    <div class="row"><span class="rl">サンプルレート</span><span class="rv d" id="r-srate">—</span></div>
+    <div class="row"><span class="rl">最大チャンネル数</span><span class="rv d" id="r-ach">—</span></div>
+    <div class="row"><span class="rl">ベースレイテンシ</span><span class="rv d" id="r-alat">—</span></div>
+    <div class="row"><span class="rl">出力レイテンシ</span><span class="rv d" id="r-aout">—</span></div>
+    <div class="row"><span class="rl">コンテキスト状態</span><span class="rv d" id="r-astate">—</span></div>
+  </div>
+</div>
+</div>
+<div class="footer">NetScope Pro — PWA対応 Single-file Diagnostic Tool<br>外部通信: ipify.org / api6.ipify.org / ipwho.is / rdap (APNIC/ARIN) / cloudflare.com / cdnjs<br>GitHub Pages でホストすると Android でもホーム画面インストール可能</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function sv(id,val,cls='d'){const el=$(id);if(!el)return;el.textContent=val;el.className='rv '+cls;}
+function badge(id,txt,cls='bg-d'){const el=$(id);if(!el)return;el.textContent=txt;el.className='bdg '+cls;}
+function fmtB(b){if(b>=1e9)return(b/1e9).toFixed(1)+' GB';if(b>=1e6)return(b/1e6).toFixed(1)+' MB';if(b>=1e3)return(b/1e3).toFixed(1)+' KB';return b+' B';}
+function fmtS(s){if(!isFinite(s)||s<0)return'—';if(s<60)return Math.round(s)+'秒';return`${Math.floor(s/60)}分${Math.round(s%60)}秒`;}
+function fmtMs(ms){if(ms<0||!isFinite(ms))return'—';return ms.toFixed(1)+' ms';}
+function fetchT(url,ms=7000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);return fetch(url,{signal:c.signal}).finally(()=>clearTimeout(t));}
+
+// ── ① Connection ───────────────────────────────────────────────
+function doConn(){
+  sv('r-online',navigator.onLine?'オンライン ✓':'オフライン ✗',navigator.onLine?'g':'b');
+  const c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  if(!c){
+    sv('r-type','API 非対応 (Safari等)','w');
+    ['r-et','r-dl','r-dlmax','r-rtt','r-save'].forEach(id=>sv(id,'—'));
+    badge('bdg-net','N/A','bg-w');
+    $('s-qual').textContent=navigator.onLine?'オンライン':'オフライン';
+    $('s-det').textContent='Network Info API 非対応ブラウザ';
+    return;
+  }
+  const typeL={wifi:'Wi-Fi 📶',cellular:'セルラー 📡',ethernet:'Ethernet 🔗',none:'オフライン',other:'その他',unknown:'不明'};
+  const type=c.type||'—';
+  sv('r-type',typeL[type]||type,type==='wifi'?'g':type==='cellular'?'w':'d');
+  const et=c.effectiveType||'—';
+  const etL={'slow-2g':'Slow-2G','2g':'2G','3g':'3G','4g':'4G'};
+  const etC={'slow-2g':'b','2g':'b','3g':'w','4g':'g'}[et]||'d';
+  sv('r-et',etL[et]||et,etC);
+  sv('r-dl',c.downlink!=null?c.downlink+' Mbps':'—','a');
+  sv('r-dlmax',c.downlinkMax!=null?c.downlinkMax+' Mbps':'—','d');
+  sv('r-rtt',c.rtt!=null?c.rtt+' ms':'—',c.rtt!=null?(c.rtt<100?'g':c.rtt<300?'w':'b'):'d');
+  sv('r-save',c.saveData?'ON（省データ有効）':'OFF',c.saveData?'w':'g');
+  badge('bdg-net',etL[et]||et,etC==='g'?'bg-g':etC==='w'?'bg-w':'bg-b');
+  const lvl={'slow-2g':1,'2g':1,'3g':2,'4g':4}[et]||(navigator.onLine?2:0);
+  const bCls=etC==='g'?'on':etC==='w'?'med':'low';
+  document.querySelectorAll('#sig .sb').forEach((b,i)=>b.className='sb'+(i<lvl?' '+bCls:''));
+  $('s-qual').textContent=typeL[type]||type||'接続中';
+  $('s-det').textContent=`${etL[et]||et} · ${c.downlink!=null?c.downlink+' Mbps':'—'} · RTT ${c.rtt!=null?c.rtt+' ms':'—'}`;
+}
+
+// ── ② IP / ISP (ipwho.is – HTTPS, ASN included) ────────────────
+async function doIPv6(){
+  try{
+    const r=await fetchT('https://api6.ipify.org?format=json',5000);
+    const d=await r.json();
+    sv('r-ipv6',`対応 ✓  ${d.ip}`,'g');
+  }catch{sv('r-ipv6','非対応 / 未割当','w');}
+}
+async function doIP(){
+  let ip='', asn=null;
+  try{
+    const r=await fetchT('https://api.ipify.org?format=json');
+    ip=(await r.json()).ip;
+    sv('r-pub',ip,'a');
+    $('s-ip').textContent=ip;
+  }catch{sv('r-pub','取得失敗','b');badge('bdg-ip','Error','bg-b');return[ip,asn];}
+  try{
+    const r=await fetchT(`https://ipwho.is/${ip}`);
+    const d=await r.json();
+    if(d.success){
+      sv('r-iptyp',d.type||'—','d');
+      sv('r-isp',d.connection?.isp||'—','d');
+      sv('r-org',d.connection?.org||'—','d');
+      asn=d.connection?.asn||null;
+      sv('r-asn',asn?`AS${asn}`:'—',asn?'a':'d');
+      sv('r-dom',d.connection?.domain||'—','d');
+      const fl={Japan:'🇯🇵','United States':'🇺🇸',China:'🇨🇳','South Korea':'🇰🇷',Germany:'🇩🇪',France:'🇫🇷','United Kingdom':'🇬🇧',Canada:'🇨🇦',Australia:'🇦🇺',India:'🇮🇳',Brazil:'🇧🇷',Taiwan:'🇹🇼'};
+      sv('r-country',`${fl[d.country]||'🌏'} ${d.country} / ${d.region}`,'d');
+      sv('r-city',(d.city||'—')+(d.postal?` (${d.postal})`:''),'d');
+      sv('r-tz',d.timezone?.id||'—','d');
+      badge('bdg-ip',d.country||'OK','bg-i');
+    }
+  }catch{badge('bdg-ip','一部失敗','bg-w');}
+  return[ip,asn];
+}
+
+// ── LAN IP (WebRTC) ────────────────────────────────────────────
+async function doLAN(){
+  try{
+    const ips=new Set(),pc=new RTCPeerConnection({iceServers:[]});
+    pc.createDataChannel('');
+    await pc.createOffer().then(o=>pc.setLocalDescription(o));
+    await new Promise(res=>{
+      pc.onicecandidate=e=>{if(!e.candidate){res();return;}const m=e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);if(m)ips.add(m[1]);};
+      setTimeout(res,1800);
+    });
+    pc.close();
+    const list=[...ips].filter(ip=>!/^(0\.|169\.254\.)/.test(ip));
+    sv('r-lan',list.length?list.join(' / '):'取得不可',list.length?'d':'w');
+  }catch{sv('r-lan','非対応 (WebRTC)','w');}
+}
+
+// ── ③ RDAP ─────────────────────────────────────────────────────
+function vcardFN(entities){
+  if(!entities)return'';
+  for(const e of entities){
+    if(e.vcardArray?.[1]){for(const item of e.vcardArray[1]){if(item[0]==='fn')return item[3];}}
+    const sub=vcardFN(e.entities);if(sub)return sub;
+  }
+  return'';
+}
+async function doRDAP(ip,asn){
+  if(!ip){sv('r-cidr','IP未取得','w');badge('bdg-rdap','スキップ','bg-w');return;}
+  // IP network RDAP
+  const ipEPs=[['APNIC','https://rdap.apnic.net/ip/'],['ARIN','https://rdap.arin.net/registry/ip/'],['RIPE','https://rdap.db.ripe.net/ip/'],['LACNIC','https://rdap.lacnic.net/rdap/ip/'],['AFRINIC','https://rdap.afrinic.net/rdap/ip/']];
+  let ipD=null,rir='不明';
+  for(const[name,base]of ipEPs){
+    try{const r=await fetchT(base+ip,6000);if(r.ok){ipD=await r.json();rir=name;break;}}catch{}
+  }
+  if(ipD){
+    let cidr='—';
+    if(ipD.cidr0_cidrs?.length){cidr=ipD.cidr0_cidrs.map(c=>c.v4prefix?`${c.v4prefix}/${c.length}`:c.v6prefix?`${c.v6prefix}/${c.length}`:'').filter(Boolean).join(', ');}
+    else if(ipD.startAddress&&ipD.endAddress){cidr=`${ipD.startAddress} – ${ipD.endAddress}`;}
+    sv('r-cidr',cidr,'a');
+    sv('r-netname',ipD.name||'—','d');
+    sv('r-handle',ipD.handle||'—','d');
+    sv('r-nettype',ipD.type||'—','d');
+    sv('r-rir',rir,'i');
+    sv('r-port43',ipD.port43||'—','d');
+    const evts=ipD.events||[];
+    const reg=evts.find(e=>e.eventAction==='registration');
+    const upd=evts.find(e=>e.eventAction==='last changed');
+    if(reg)sv('r-regdate',new Date(reg.eventDate).toLocaleDateString('ja-JP'),'d');
+    if(upd)sv('r-upddate',new Date(upd.eventDate).toLocaleDateString('ja-JP'),'d');
+    const org=vcardFN(ipD.entities);if(org)sv('r-rdaporg',org,'d');
+    badge('bdg-rdap',rir,'bg-i');
+  }else{sv('r-cidr','取得失敗','b');badge('bdg-rdap','取得失敗','bg-b');}
+  // ASN RDAP
+  if(asn){
+    const asnEPs=[`https://rdap.arin.net/registry/autnum/${asn}`,`https://rdap.apnic.net/autnum/${asn}`];
+    for(const url of asnEPs){
+      try{
+        const r=await fetchT(url,5000);
+        if(r.ok){const d=await r.json();sv('r-rdapasn',d.handle||`AS${asn}`,'a');sv('r-rdapasname',d.name||'—','d');break;}
+      }catch{}
+    }
+    if($('r-rdapasn').textContent==='—')sv('r-rdapasn',`AS${asn} (RDAP取得失敗)`,'w');
+  }
+}
+
+// ── ④ Cloudflare Trace ─────────────────────────────────────────
+async function doCF(){
+  try{
+    const r=await fetchT('https://www.cloudflare.com/cdn-cgi/trace',5000);
+    const txt=await r.text();
+    const d={};
+    txt.split('\n').forEach(l=>{const i=l.indexOf('=');if(i>0)d[l.slice(0,i)]=l.slice(i+1).trim();});
+    const httpL={'http/1.1':'HTTP/1.1','http/2':'HTTP/2 ✓','http/3':'HTTP/3 ✓'};
+    const httpC={'http/1.1':'w','http/2':'g','http/3':'g'};
+    sv('r-http',httpL[d.http]||d.http||'—',httpC[d.http]||'d');
+    const tlsC={'TLSv1.3':'g','TLSv1.2':'w','TLSv1.1':'b','TLSv1.0':'b'};
+    sv('r-tls',d.tls||'—',tlsC[d.tls]||'w');
+    sv('r-kex',d.kex||'—',d.kex?'g':'d');
+    sv('r-sni',d.sni==='encrypted'?'暗号化済 ✓':d.sni==='plaintext'?'平文 ⚠':d.sni||'—',d.sni==='encrypted'?'g':d.sni==='plaintext'?'b':'d');
+    const coloCity={NRT:'成田 (NRT)',KIX:'関西 (KIX)',FUK:'福岡 (FUK)',SPK:'千歳 (SPK)',OKA:'那覇 (OKA)',ITM:'大阪伊丹 (ITM)',NGO:'中部 (NGO)',SIN:'シンガポール (SIN)',HKG:'香港 (HKG)',LAX:'ロサンゼルス (LAX)',SJC:'サンノゼ (SJC)',NRT2:'成田2 (NRT)'};
+    sv('r-colo',coloCity[d.colo]||d.colo||'—','i');
+    sv('r-cfloc',d.loc||'—','d');
+    sv('r-warp',d.warp==='on'?'使用中 (WARP)':d.warp==='off'?'未使用':d.warp||'—',d.warp==='on'?'w':'g');
+    sv('r-gw',d.gateway==='on'?'経由中 (Zero Trust)':d.gateway==='off'?'なし':d.gateway||'—',d.gateway==='on'?'i':'g');
+    badge('bdg-cf',d.colo||'取得済','bg-g');
+  }catch{sv('r-http','取得失敗','b');badge('bdg-cf','Error','bg-b');}
+}
+
+// ── ⑤ Speed Test ───────────────────────────────────────────────
+async function runSpeed(){
+  const btn=$('btn-spd');
+  btn.disabled=true;btn.textContent='計測中...';
+  $('spd-num').textContent='—';$('spd-hint').textContent='計測中...';$('spd-fill').style.width='0%';
+  badge('bdg-spd','計測中','bg-d');
+  try{
+    const t0=performance.now();
+    await fetchT('https://www.cloudflare.com/cdn-cgi/trace',3000);
+    const rtt=Math.round(performance.now()-t0);
+    sv('r-srtt',rtt+' ms',rtt<80?'g':rtt<200?'w':'b');
+    const url='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js?_='+Date.now();
+    const s=performance.now();
+    const res=await fetch(url,{cache:'no-store'});
+    const buf=await res.arrayBuffer();
+    const dur=(performance.now()-s)/1000;
+    const mbps=(buf.byteLength*8)/dur/1e6;
+    $('spd-num').textContent=mbps.toFixed(1);
+    $('spd-hint').textContent=`${fmtB(buf.byteLength)} / ${dur.toFixed(2)}s`;
+    $('spd-fill').style.width=Math.min(mbps/100*100,100)+'%';
+    $('spd-rows').style.display='';
+    sv('r-ssize',fmtB(buf.byteLength),'d');
+    sv('r-stime',dur.toFixed(2)+' 秒','d');
+    const sc=mbps>=20?'g':mbps>=5?'w':'b';
+    badge('bdg-spd',mbps.toFixed(1)+' Mbps','bg-'+sc);
+  }catch{$('spd-num').textContent='Error';badge('bdg-spd','Error','bg-b');}
+  btn.disabled=false;btn.textContent='再計測';
+}
+
+// ── ⑥ Performance Timing ───────────────────────────────────────
+function doTiming(){
+  try{
+    const nav=performance.getEntriesByType('navigation')[0];
+    if(nav){
+      const dns=nav.domainLookupEnd-nav.domainLookupStart;
+      const tcp=nav.connectEnd-nav.connectStart;
+      const tls=nav.secureConnectionStart>0?nav.connectEnd-nav.secureConnectionStart:-1;
+      const ttfb=nav.responseStart-nav.requestStart;
+      const domL=nav.domContentLoadedEventEnd-nav.startTime;
+      sv('r-dns',fmtMs(dns),dns<50?'g':dns<200?'w':'b');
+      sv('r-tcp',fmtMs(tcp),tcp<100?'g':tcp<300?'w':'b');
+      sv('r-tlst',tls>=0?fmtMs(tls):'HTTP（暗号化なし）',tls>=0?(tls<150?'g':tls<400?'w':'b'):'w');
+      sv('r-ttfb',fmtMs(ttfb),ttfb<200?'g':ttfb<500?'w':'b');
+      sv('r-domload',fmtMs(domL),domL<1000?'g':domL<3000?'w':'b');
+    }else{
+      const t=performance.timing;
+      sv('r-dns',fmtMs(t.domainLookupEnd-t.domainLookupStart),'d');
+      sv('r-tcp',fmtMs(t.connectEnd-t.connectStart),'d');
+      sv('r-tlst','—');
+      sv('r-ttfb',fmtMs(t.responseStart-t.requestStart),'d');
+      sv('r-domload','—');
+    }
+  }catch{sv('r-dns','API 非対応','w');}
+  if(performance.memory){
+    sv('r-heap',fmtB(performance.memory.usedJSHeapSize),'a');
+    sv('r-heaplim',fmtB(performance.memory.jsHeapSizeLimit),'d');
+  }else{sv('r-heap','非対応 (Chrome 限定)','w');sv('r-heaplim','—');}
+}
+
+// ── ⑦ Device ────────────────────────────────────────────────────
+async function doDevice(){
+  const ua=navigator.userAgent;
+  $('r-ua').textContent=ua;$('r-ua').className='rv';
+  sv('r-cores',(navigator.hardwareConcurrency||'—')+' コア','d');
+  sv('r-mem',navigator.deviceMemory?navigator.deviceMemory+' GB (概算)':'非対応',navigator.deviceMemory?'d':'w');
+  sv('r-touch',navigator.maxTouchPoints>0?navigator.maxTouchPoints+' ポイント':'タッチ非対応',navigator.maxTouchPoints>0?'g':'d');
+  if(navigator.userAgentData){
+    sv('r-plat',navigator.userAgentData.platform||navigator.platform||'—','d');
+    try{
+      const hi=await navigator.userAgentData.getHighEntropyValues(['model','platformVersion','architecture']);
+      sv('r-model',hi.model||'（非公開）','d');
+      sv('r-os',`${navigator.userAgentData.platform} ${hi.platformVersion||''} ${hi.architecture?'('+hi.architecture+')':''}`.trim(),'d');
+    }catch{parseUA();}
+  }else{sv('r-plat',navigator.platform||'—','d');parseUA();}
+  try{
+    const cv=document.createElement('canvas');
+    const gl=cv.getContext('webgl')||cv.getContext('experimental-webgl');
+    if(gl){const ext=gl.getExtension('WEBGL_debug_renderer_info');sv('r-gpu',ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER),'d');}
+    else sv('r-gpu','WebGL 非対応','w');
+  }catch{sv('r-gpu','取得失敗','w');}
+  // WebGL2
+  try{const gl2=document.createElement('canvas').getContext('webgl2');sv('r-webgl2',gl2?'対応 ✓':'非対応',gl2?'g':'w');}
+  catch{sv('r-webgl2','非対応','w');}
+  // WebGPU
+  sv('r-webgpu','gpu' in navigator?'対応 ✓ (navigator.gpu)':'非対応','gpu' in navigator?'g':'w');
+  // WebAssembly
+  sv('r-wasm',typeof WebAssembly!=='undefined'?'対応 ✓':'非対応',typeof WebAssembly!=='undefined'?'g':'b');
+}
+function parseUA(){
+  const ua=navigator.userAgent;let os='—',model='—';
+  if(/iPhone|iPad/.test(ua)){const m=ua.match(/OS ([\d_]+)/);os='iOS '+(m?m[1].replace(/_/g,'.'):ua);model=/iPhone/.test(ua)?'iPhone':'iPad';}
+  else if(/Android/.test(ua)){const mv=ua.match(/Android ([\d.]+)/);os='Android '+(mv?mv[1]:'—');const ms=ua.match(/;\s*([^;]+)\sBuild\//);if(ms)model=ms[1].trim();}
+  else if(/Windows/.test(ua)){const m=ua.match(/Windows NT ([\d.]+)/);const t={'10.0':'10/11','6.3':'8.1','6.2':'8','6.1':'7'};os='Windows '+(t[m?.[1]]||m?.[1]||'—');}
+  else if(/Mac OS X/.test(ua)){const m=ua.match(/Mac OS X ([\d_]+)/);os='macOS '+(m?m[1].replace(/_/g,'.'):ua);}
+  sv('r-model',model,'d');sv('r-os',os,'d');
+}
+
+// ── ⑧ Screen ────────────────────────────────────────────────────
+function doScreen(){
+  const dpr=window.devicePixelRatio||1;
+  sv('r-phys',`${Math.round(screen.width*dpr)} × ${Math.round(screen.height*dpr)} px`,'d');
+  sv('r-logi',`${screen.width} × ${screen.height} pt`,'d');
+  sv('r-dpr',dpr+'x',dpr>=3?'g':dpr>=2?'a':'d');
+  sv('r-ori',screen.orientation?.type||'—','d');
+  sv('r-depth',screen.colorDepth+' bit','d');
+  sv('r-hdr',window.matchMedia('(dynamic-range: high)').matches?'対応 ✓':'非対応',window.matchMedia('(dynamic-range: high)').matches?'g':'d');
+  const p3=window.matchMedia('(color-gamut: p3)').matches;
+  sv('r-gamut',p3?'Display P3 (広色域)':window.matchMedia('(color-gamut: srgb)').matches?'sRGB':'標準以下',p3?'g':'d');
+  sv('r-avail',`${screen.availWidth} × ${screen.availHeight} pt`,'d');
+  sv('r-outer',`${window.outerWidth} × ${window.outerHeight} pt`,'d');
+}
+
+// ── ⑨ Battery ───────────────────────────────────────────────────
+async function doBattery(){
+  if(!navigator.getBattery){
+    $('bat-p').textContent='非対応';$('bat-s').textContent='Battery API サポート外';
+    sv('r-chrg','API 非対応','w');sv('r-ctime','—');sv('r-dtime','—');
+    badge('bdg-bat','N/A','bg-w');return;
+  }
+  try{
+    const b=await navigator.getBattery();
+    const pct=Math.round(b.level*100);
+    $('bat-p').textContent=pct+'%';
+    $('bat-f').style.width=pct+'%';
+    $('bat-f').style.background=pct>50?'var(--good)':pct>20?'var(--warn)':'var(--bad)';
+    $('bat-s').textContent=b.charging?'充電中 ⚡':'放電中 🔋';
+    sv('r-chrg',b.charging?'充電中 ⚡':'放電中 🔋',b.charging?'g':'d');
+    sv('r-ctime',b.charging?fmtS(b.chargingTime):'—','d');
+    sv('r-dtime',!b.charging?fmtS(b.dischargingTime):'—','d');
+    badge('bdg-bat',pct+'%',pct>50?'bg-g':pct>20?'bg-w':'bg-b');
+  }catch{$('bat-p').textContent='—';$('bat-s').textContent='取得失敗';badge('bdg-bat','Error','bg-b');}
+}
+
+// ── ⑩ Storage ───────────────────────────────────────────────────
+async function doStorage(){
+  if(navigator.storage?.estimate){
+    try{
+      const{usage,quota}=await navigator.storage.estimate();
+      const pct=quota>0?(usage/quota*100):0;
+      sv('r-stou',fmtB(usage),'a');sv('r-stoq',fmtB(quota),'d');
+      sv('r-stop',pct.toFixed(1)+'%',pct>80?'b':pct>50?'w':'g');
+      $('sto-f').style.width=pct+'%';
+      $('sto-u').textContent='使用中: '+fmtB(usage);
+      $('sto-t').textContent='合計: '+fmtB(quota);
+    }catch{sv('r-stou','取得失敗','b');}
+  }else sv('r-stou','API 非対応','w');
+  if(navigator.storage?.persisted){
+    try{const p=await navigator.storage.persisted();sv('r-persist',p?'永続化済 ✓':'未永続化',p?'g':'w');}
+    catch{sv('r-persist','—');}
+  }else sv('r-persist','API 非対応','w');
+  sv('r-idb','indexedDB' in window?'対応 ✓':'非対応','indexedDB' in window?'g':'b');
+  sv('r-ls','localStorage' in window?'対応 ✓':'非対応','localStorage' in window?'g':'b');
+  sv('r-ss','sessionStorage' in window?'対応 ✓':'非対応','sessionStorage' in window?'g':'b');
+  sv('r-cs','caches' in window?'対応 ✓':'非対応','caches' in window?'g':'d');
+}
+
+// ── ⑪ Media & Permissions ──────────────────────────────────────
+async function doMediaPerms(){
+  if(navigator.mediaDevices?.enumerateDevices){
+    try{
+      const devs=await navigator.mediaDevices.enumerateDevices();
+      sv('r-cams',devs.filter(d=>d.kind==='videoinput').length+'台','g');
+      sv('r-mics',devs.filter(d=>d.kind==='audioinput').length+'台','g');
+      sv('r-spks',devs.filter(d=>d.kind==='audiooutput').length+'台','g');
+    }catch{sv('r-cams','取得失敗','w');}
+  }else sv('r-cams','API 非対応','w');
+  if(!navigator.permissions){
+    ['r-pgeo','r-pcam','r-pmic','r-pnot','r-pcbr','r-pcbw'].forEach(id=>sv(id,'API 非対応','w'));
+    return;
+  }
+  const pLabel={'granted':'許可済 ✓','denied':'拒否 ✗','prompt':'未確認'};
+  const pClass={'granted':'g','denied':'b','prompt':'w'};
+  const perms=[['r-pgeo','geolocation'],['r-pcam','camera'],['r-pmic','microphone'],['r-pnot','notifications'],['r-pcbr','clipboard-read'],['r-pcbw','clipboard-write']];
+  for(const[id,name]of perms){
+    try{const res=await navigator.permissions.query({name});sv(id,pLabel[res.state]||res.state,pClass[res.state]||'d');}
+    catch{sv(id,'確認不可','w');}
+  }
+}
+
+// ── ⑫ Browser / Env ────────────────────────────────────────────
+function doEnv(){
+  const ua=navigator.userAgent;
+  let br='不明';
+  if(navigator.userAgentData?.brands){
+    const b=navigator.userAgentData.brands.filter(b=>!/Not|Brand/.test(b.brand)).map(b=>`${b.brand} ${b.version}`).join(', ');
+    if(b)br=b;
+  }else{
+    if(/CriOS/.test(ua))br='Chrome (iOS)';
+    else if(/FxiOS/.test(ua))br='Firefox (iOS)';
+    else if(/EdgiOS/.test(ua))br='Edge (iOS)';
+    else if(/SamsungBrowser/.test(ua)){const m=ua.match(/SamsungBrowser\/([\d.]+)/);br='Samsung Browser '+(m?.[1]||'');}
+    else if(/Chrome\//.test(ua)){const m=ua.match(/Chrome\/([\d.]+)/);br='Chrome '+(m?.[1]||'');}
+    else if(/Version\//.test(ua)&&/Safari/.test(ua)){const m=ua.match(/Version\/([\d.]+)/);br='Safari '+(m?.[1]||'');}
+    else if(/Firefox\//.test(ua)){const m=ua.match(/Firefox\/([\d.]+)/);br='Firefox '+(m?.[1]||'');}
+  }
+  sv('r-brow',br,'d');
+  sv('r-lang',navigator.language+(navigator.languages?.length>1?' + '+navigator.languages.slice(1,3).join(', '):''),'d');
+  sv('r-cookie',navigator.cookieEnabled?'有効 ✓':'無効',navigator.cookieEnabled?'g':'b');
+  sv('r-dnt',navigator.doNotTrack==='1'?'ON（追跡拒否）':navigator.doNotTrack==='0'?'OFF':'未設定',navigator.doNotTrack==='1'?'g':'d');
+  sv('r-dark',window.matchMedia('(prefers-color-scheme: dark)').matches?'ダーク ✓':'ライト',window.matchMedia('(prefers-color-scheme: dark)').matches?'i':'d');
+  sv('r-motion',window.matchMedia('(prefers-reduced-motion: reduce)').matches?'省アニメ ON':'OFF',window.matchMedia('(prefers-reduced-motion: reduce)').matches?'w':'g');
+  sv('r-gyro','DeviceOrientationEvent' in window?'対応 ✓':'非対応','DeviceOrientationEvent' in window?'g':'d');
+  sv('r-vib','vibrate' in navigator?'対応 ✓':'非対応','vibrate' in navigator?'g':'d');
+  sv('r-bt','bluetooth' in navigator?'対応 ✓':'非対応 / 制限中','bluetooth' in navigator?'g':'w');
+  sv('r-sw','serviceWorker' in navigator?'対応 ✓':'非対応','serviceWorker' in navigator?'g':'d');
+  sv('r-wd',navigator.webdriver?'自動化ツール検出 ⚠':'通常ブラウザ',navigator.webdriver?'b':'g');
+  const sa=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  sv('r-pwa',sa?'PWA / スタンドアロン':'ブラウザ内',sa?'i':'d');
+  sv('r-pdf','pdfViewerEnabled' in navigator?navigator.pdfViewerEnabled?'内蔵あり ✓':'無効':'判定不可','pdfViewerEnabled' in navigator?navigator.pdfViewerEnabled?'g':'w':'d');
+  sv('r-kbd','keyboard' in navigator?'対応 (Keyboard API)':'非対応','keyboard' in navigator?'g':'d');
+  sv('r-geo','geolocation' in navigator?'対応 ✓':'非対応','geolocation' in navigator?'g':'d');
+  sv('r-ts',new Date().toLocaleString('ja-JP'),'d');
+}
+
+// ── ⑬ Audio Context ─────────────────────────────────────────────
+function doAudio(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){sv('r-srate','API 非対応','w');badge('bdg-audio','N/A','bg-w');return;}
+    const ctx=new AC();
+    sv('r-srate',ctx.sampleRate.toLocaleString()+' Hz',ctx.sampleRate>=44100?'g':'w');
+    sv('r-ach',ctx.destination.maxChannelCount+' ch','d');
+    sv('r-alat',ctx.baseLatency!=null?(ctx.baseLatency*1000).toFixed(2)+' ms':'—',
+      ctx.baseLatency!=null?(ctx.baseLatency<0.01?'g':ctx.baseLatency<0.05?'w':'b'):'d');
+    sv('r-aout',ctx.outputLatency!=null?(ctx.outputLatency*1000).toFixed(2)+' ms':'—','d');
+    sv('r-astate',ctx.state,ctx.state==='running'?'g':'w');
+    badge('bdg-audio',ctx.sampleRate>=44100?'Hi-Fi':'標準','bg-g');
+    ctx.close();
+  }catch(e){sv('r-srate','取得失敗','b');badge('bdg-audio','Error','bg-b');}
+}
+
+// ── MAIN ────────────────────────────────────────────────────────
+async function runAll(){
+  $('s-qual').textContent='診断中...';$('s-det').textContent='情報を収集しています';$('s-ip').textContent='—';
+  // Sync (instant)
+  doConn(); doScreen(); doEnv(); doTiming(); doAudio();
+  // IP first (other funcs need ip/asn)
+  const[ip,asn]=await doIP();
+  // Parallel async
+  await Promise.all([
+    doLAN(),
+    doIPv6(),
+    doRDAP(ip,asn),
+    doCF(),
+    doDevice(),
+    doBattery(),
+    doStorage(),
+    doMediaPerms(),
+  ]);
+}
+
+runAll();
+if(navigator.connection)navigator.connection.addEventListener('change',doConn);
+window.addEventListener('online',doConn);
+window.addEventListener('offline',doConn);
+screen.orientation?.addEventListener('change',doScreen);
+
+// ── PWA INIT ─────────────────────────────────────────────────────
+(function initPWA(){
+  const ICON_B64='PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==';
+
+  // 1) Inject Web Manifest via Blob URL
+  const manifest={
+    name:'NetScope Pro',short_name:'NetScope',
+    description:'ネットワーク診断ツール',
+    start_url:location.href,
+    display:'standalone',
+    background_color:'#06090f',theme_color:'#06090f',
+    orientation:'portrait-primary',
+    icons:[{src:`data:image/svg+xml;base64,${ICON_B64}`,sizes:'any',type:'image/svg+xml',purpose:'any maskable'}]
+  };
+  const mBlob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const mUrl=URL.createObjectURL(mBlob);
+  const mLink=document.createElement('link');
+  mLink.rel='manifest';mLink.href=mUrl;
+  document.head.appendChild(mLink);
+
+  // 2) Register Service Worker via Blob URL (caches the HTML for offline)
+  if('serviceWorker' in navigator){
+    const swCode=`
+const CACHE='netscope-v1';
+self.addEventListener('install',e=>{
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c=>c.add(self.location.pathname.replace(/[?#].*/,''))));
+});
+self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  const u=e.request.url;
+  if(['api.ipify','ipwho','rdap','cloudflare','cdnjs','fonts.google'].some(s=>u.includes(s)))return;
+  e.respondWith(caches.open(CACHE).then(c=>c.match(e.request)).then(r=>r||fetch(e.request).then(res=>{
+    caches.open(CACHE).then(c=>c.put(e.request,res.clone()));return res;
+  }).catch(()=>new Response('Offline',{status:503,headers:{'Content-Type':'text/plain'}}))));
+});`;
+    const swBlob=new Blob([swCode],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
+
+  // 3) Android install prompt
+  let deferred=null;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferred=e;
+    setTimeout(()=>document.getElementById('ibar').classList.add('show'),1200);
+  });
+  document.getElementById('ibar-btn').addEventListener('click',async()=>{
+    if(!deferred)return;
+    deferred.prompt();
+    await deferred.userChoice;
+    deferred=null;
+    document.getElementById('ibar').classList.remove('show');
+  });
+  window.addEventListener('appinstalled',()=>document.getElementById('ibar').style.display='none');
+
+  // 4) iOS hint — show once if on iOS Safari and not standalone
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isSafari=/Safari/.test(navigator.userAgent)&&!/Chrome|CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
+  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  if(isIOS&&isSafari&&!isStandalone&&!sessionStorage.getItem('ios-hint-shown')){
+    sessionStorage.setItem('ios-hint-shown','1');
+    setTimeout(()=>document.getElementById('ios-hint').classList.add('show'),2000);
+  }
+})();
+</script>
+<!-- Android install bar -->
+<div class="ibar" id="ibar">
+  <img class="ibar-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==" alt="NS">
+  <div class="ibar-txt">
+    <div class="ibar-ttl">ホーム画面に追加</div>
+    <div class="ibar-sub">NetScope Pro をインストール</div>
+  </div>
+  <button class="ibar-btn" id="ibar-btn">インストール</button>
+  <span class="ibar-x" onclick="document.getElementById('ibar').classList.remove('show')">✕</span>
+</div>
+
+<!-- iOS hint -->
+<div class="ios-hint" id="ios-hint">
+  <div class="ios-hint-ttl">ホーム画面に追加 <span style="cursor:pointer;color:var(--dim);font-size:18px" onclick="document.getElementById('ios-hint').classList.remove('show')">✕</span></div>
+  <div class="ios-hint-body">
+    画面下の <span>共有ボタン 􀈂</span> をタップ<br>
+    → <span>「ホーム画面に追加」</span> を選択<br>
+    → 右上の <span>「追加」</span> をタップ
+  </div>
+</div>
+
+
+</html>
