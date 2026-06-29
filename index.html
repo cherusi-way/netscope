@@ -6249,25 +6249,30 @@ setTimeout(checkForUpdate,45000);
     // 再びインストール可能＝（アンインストール後など）未導入状態なので記録を消して同期
     try{localStorage.removeItem('netscope-installed');}catch{}
     updateInstallButton();
-    setTimeout(()=>document.getElementById('ibar').classList.add('show'),1200);
+    setTimeout(()=>{const ib=document.getElementById('ibar');if(ib)ib.classList.add('show');},1200);
   });
-  document.getElementById('btn-install').addEventListener('click',doInstall);
-  document.getElementById('ibar-btn').addEventListener('click',doInstall);
   window.addEventListener('appinstalled',()=>{
     deferred=null;
     try{localStorage.setItem('netscope-installed','1');}catch{}
-    document.getElementById('ibar').style.display='none';
+    const ib=document.getElementById('ibar');if(ib)ib.style.display='none';
     updateInstallButton(); // 「インストール済み」表示へ切替（ボタンは消さない）
   });
 
-  // 4) iOS: 初回のみ自動でヒントを表示
-  if(isIOS&&isSafari&&!inStandalone()&&!isInstalledState()&&!sessionStorage.getItem('ios-hint-shown')){
-    sessionStorage.setItem('ios-hint-shown','1');
-    setTimeout(()=>document.getElementById('ios-hint').classList.add('show'),2000);
+  // DOM要素（ヘッダーボタン・下部バー・iOSヒント）への接続は要素が存在してから行う。
+  // ※ このスクリプトは下部バー等のHTMLより前に位置するため、未構築なら DOMContentLoaded を待つ。
+  //   （待たずに getElementById すると null となり addEventListener で例外→以降が実行されない）
+  function wireInstallUI(){
+    const bi=document.getElementById('btn-install');if(bi)bi.addEventListener('click',doInstall);
+    const ib=document.getElementById('ibar-btn');if(ib)ib.addEventListener('click',doInstall);
+    // iOS: 初回のみ自動でヒントを表示
+    if(isIOS&&isSafari&&!inStandalone()&&!isInstalledState()&&!sessionStorage.getItem('ios-hint-shown')){
+      sessionStorage.setItem('ios-hint-shown','1');
+      setTimeout(()=>{const h=document.getElementById('ios-hint');if(h)h.classList.add('show');},2000);
+    }
+    updateInstallButton(); // 起動時にボタン状態を反映（.show を付与＝常に表示）
   }
-
-  // 起動時にボタン状態を反映
-  updateInstallButton();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wireInstallUI);
+  else wireInstallUI();
 })();
 </script>
 <!-- Android install bar -->
