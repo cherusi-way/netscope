@@ -31,6 +31,11 @@ body{background:var(--bg);color:var(--txt);font-family:'Exo 2','Hiragino Sans','
 .app-n{font-weight:800;font-size:20px;letter-spacing:-.03em;background:linear-gradient(120deg,#e8f4ff,var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .app-s{font-size:9px;color:var(--dim);letter-spacing:.18em;text-transform:uppercase;margin-top:1px}
 .btn-r{background:var(--acc-d);border:1px solid rgba(59,158,255,.28);color:var(--acc);padding:8px 15px;border-radius:9px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
+.btn-install{display:none;align-items:center;gap:5px;background:var(--acc);border:none;color:#06090f;padding:8px 13px;border-radius:9px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 10px rgba(59,158,255,.3)}
+.btn-install.show{display:flex}
+.btn-install:active{opacity:.85;transform:scale(.97)}
+.bi-txt{font-size:12px;line-height:1}
+@media (max-width:390px){.bi-txt{display:none}.btn-install{padding:8px 11px;font-size:15px}}
 .btn-r:active{opacity:.65;transform:scale(.96)}
 /* STRIP */
 .strip{margin:14px 15px 0;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px}
@@ -813,6 +818,7 @@ body.live-active{padding-bottom:200px}
 <header class="hdr">
   <div><div class="app-n">NetScope Pro</div><div class="app-s">Network Diagnostics</div></div>
   <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn-install" id="btn-install" title="アプリをインストール" aria-label="アプリをインストール">⬇<span class="bi-txt">インストール</span></button>
     <div class="mode-tog">
       <button class="mode-opt on" id="mode-simple">簡易</button>
       <button class="mode-opt" id="mode-full">詳細</button>
@@ -6177,29 +6183,60 @@ setTimeout(checkForUpdate,45000);
     });
   }
 
-  // 3) Android install prompt
-  let deferred=null;
-  window.addEventListener('beforeinstallprompt',e=>{
-    e.preventDefault();deferred=e;
-    setTimeout(()=>document.getElementById('ibar').classList.add('show'),1200);
-  });
-  document.getElementById('ibar-btn').addEventListener('click',async()=>{
-    if(!deferred)return;
-    deferred.prompt();
-    await deferred.userChoice;
-    deferred=null;
-    document.getElementById('ibar').classList.remove('show');
-  });
-  window.addEventListener('appinstalled',()=>document.getElementById('ibar').style.display='none');
-
-  // 4) iOS hint — show once if on iOS Safari and not standalone
+  // 3) インストール導線（ヘッダー常設ボタン + 下部バー + iOSヒント）
   const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
   const isSafari=/Safari/.test(navigator.userAgent)&&!/Chrome|CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
-  const isStandalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
-  if(isIOS&&isSafari&&!isStandalone&&!sessionStorage.getItem('ios-hint-shown')){
+  const inStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  let deferred=null;
+
+  function updateInstallButton(){
+    const btn=document.getElementById('btn-install');
+    if(!btn)return;
+    // インストール済み（スタンドアロン起動）では非表示。プロンプト利用可、またはiOSなら表示。
+    if(!inStandalone()&&(deferred||isIOS)) btn.classList.add('show');
+    else btn.classList.remove('show');
+  }
+
+  async function doInstall(){
+    // ① ネイティブのインストールプロンプトが使える場合（Android Chrome / Edge / デスクトップChrome等）
+    if(deferred){
+      deferred.prompt();
+      const choice=await deferred.userChoice.catch(()=>null);
+      deferred=null;
+      document.getElementById('ibar').classList.remove('show');
+      updateInstallButton();
+      return;
+    }
+    // ② iOS Safari はプロンプトAPIが無いため、手順シートを表示
+    if(isIOS){
+      document.getElementById('ios-hint').classList.add('show');
+      return;
+    }
+    // ③ それ以外（プロンプト未取得のブラウザ等）はメニュー操作を案内
+    if(typeof toast==='function') toast('ブラウザのメニューから「アプリをインストール」または「ホーム画面に追加」を選んでください');
+  }
+
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferred=e;
+    updateInstallButton();
+    setTimeout(()=>document.getElementById('ibar').classList.add('show'),1200);
+  });
+  document.getElementById('btn-install').addEventListener('click',doInstall);
+  document.getElementById('ibar-btn').addEventListener('click',doInstall);
+  window.addEventListener('appinstalled',()=>{
+    deferred=null;
+    document.getElementById('ibar').style.display='none';
+    const b=document.getElementById('btn-install');if(b)b.classList.remove('show');
+  });
+
+  // 4) iOS: 初回のみ自動でヒントを表示
+  if(isIOS&&isSafari&&!inStandalone()&&!sessionStorage.getItem('ios-hint-shown')){
     sessionStorage.setItem('ios-hint-shown','1');
     setTimeout(()=>document.getElementById('ios-hint').classList.add('show'),2000);
   }
+
+  // 起動時にボタン表示を反映（iOSは即時表示／プロンプト発火済みのケースにも対応）
+  updateInstallButton();
 })();
 </script>
 <!-- Android install bar -->
