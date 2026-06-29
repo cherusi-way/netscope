@@ -33,9 +33,11 @@ body{background:var(--bg);color:var(--txt);font-family:'Exo 2','Hiragino Sans','
 .btn-r{background:var(--acc-d);border:1px solid rgba(59,158,255,.28);color:var(--acc);padding:8px 15px;border-radius:9px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
 .btn-install{display:none;align-items:center;gap:5px;background:var(--acc);border:none;color:#06090f;padding:8px 13px;border-radius:9px;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;letter-spacing:.03em;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 2px 10px rgba(59,158,255,.3)}
 .btn-install.show{display:flex}
-.btn-install:active{opacity:.85;transform:scale(.97)}
+.btn-install:not(.installed):active{opacity:.85;transform:scale(.97)}
+.btn-install.installed{background:var(--surf);color:var(--good);border:1px solid var(--bdr);box-shadow:none;cursor:default}
+.bi-ico{font-size:14px;line-height:1}
 .bi-txt{font-size:12px;line-height:1}
-@media (max-width:390px){.bi-txt{display:none}.btn-install{padding:8px 11px;font-size:15px}}
+@media (max-width:390px){.bi-txt{display:none}.btn-install{padding:8px 12px}.bi-ico{font-size:16px}}
 .btn-r:active{opacity:.65;transform:scale(.96)}
 /* STRIP */
 .strip{margin:14px 15px 0;background:var(--surf);border:1px solid var(--bdr);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px}
@@ -818,7 +820,7 @@ body.live-active{padding-bottom:200px}
 <header class="hdr">
   <div><div class="app-n">NetScope Pro</div><div class="app-s">Network Diagnostics</div></div>
   <div style="display:flex;align-items:center;gap:8px">
-    <button class="btn-install" id="btn-install" title="アプリをインストール" aria-label="アプリをインストール">⬇<span class="bi-txt">インストール</span></button>
+    <button class="btn-install" id="btn-install" title="アプリをインストール" aria-label="アプリをインストール"><span class="bi-ico">⬇</span><span class="bi-txt">インストール</span></button>
     <div class="mode-tog">
       <button class="mode-opt on" id="mode-simple">簡易</button>
       <button class="mode-opt" id="mode-full">詳細</button>
@@ -6189,21 +6191,47 @@ setTimeout(checkForUpdate,45000);
   const inStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
   let deferred=null;
 
+  function isInstalledState(){
+    // スタンドアロン起動中、または過去にインストール済みを記録している場合は「導入済み」
+    if(inStandalone())return true;
+    try{return localStorage.getItem('netscope-installed')==='1';}catch{return false;}
+  }
+
   function updateInstallButton(){
     const btn=document.getElementById('btn-install');
     if(!btn)return;
-    // インストール済み（スタンドアロン起動）では非表示。プロンプト利用可、またはiOSなら表示。
-    if(!inStandalone()&&(deferred||isIOS)) btn.classList.add('show');
-    else btn.classList.remove('show');
+    btn.classList.add('show'); // 常に表示
+    const ico=btn.querySelector('.bi-ico');
+    const txt=btn.querySelector('.bi-txt');
+    if(isInstalledState()){
+      // すでにインストール済み → 「✓ インストール済み」表示（押しても再インストールしない）
+      btn.classList.add('installed');
+      btn.title='インストール済み';
+      btn.setAttribute('aria-label','インストール済み');
+      if(ico)ico.textContent='✓';
+      if(txt)txt.textContent='インストール済み';
+    }else{
+      btn.classList.remove('installed');
+      btn.title='アプリをインストール';
+      btn.setAttribute('aria-label','アプリをインストール');
+      if(ico)ico.textContent='⬇';
+      if(txt)txt.textContent='インストール';
+    }
   }
 
   async function doInstall(){
+    // すでに導入済みなら確認メッセージのみ
+    if(isInstalledState()){
+      if(typeof toast==='function') toast('このアプリはすでにインストールされています');
+      return;
+    }
     // ① ネイティブのインストールプロンプトが使える場合（Android Chrome / Edge / デスクトップChrome等）
     if(deferred){
       deferred.prompt();
       const choice=await deferred.userChoice.catch(()=>null);
       deferred=null;
       document.getElementById('ibar').classList.remove('show');
+      if(choice&&choice.outcome==='accepted'){try{localStorage.setItem('netscope-installed','1');}catch{}}
       updateInstallButton();
       return;
     }
@@ -6218,6 +6246,8 @@ setTimeout(checkForUpdate,45000);
 
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault();deferred=e;
+    // 再びインストール可能＝（アンインストール後など）未導入状態なので記録を消して同期
+    try{localStorage.removeItem('netscope-installed');}catch{}
     updateInstallButton();
     setTimeout(()=>document.getElementById('ibar').classList.add('show'),1200);
   });
@@ -6225,17 +6255,18 @@ setTimeout(checkForUpdate,45000);
   document.getElementById('ibar-btn').addEventListener('click',doInstall);
   window.addEventListener('appinstalled',()=>{
     deferred=null;
+    try{localStorage.setItem('netscope-installed','1');}catch{}
     document.getElementById('ibar').style.display='none';
-    const b=document.getElementById('btn-install');if(b)b.classList.remove('show');
+    updateInstallButton(); // 「インストール済み」表示へ切替（ボタンは消さない）
   });
 
   // 4) iOS: 初回のみ自動でヒントを表示
-  if(isIOS&&isSafari&&!inStandalone()&&!sessionStorage.getItem('ios-hint-shown')){
+  if(isIOS&&isSafari&&!inStandalone()&&!isInstalledState()&&!sessionStorage.getItem('ios-hint-shown')){
     sessionStorage.setItem('ios-hint-shown','1');
     setTimeout(()=>document.getElementById('ios-hint').classList.add('show'),2000);
   }
 
-  // 起動時にボタン表示を反映（iOSは即時表示／プロンプト発火済みのケースにも対応）
+  // 起動時にボタン状態を反映
   updateInstallButton();
 })();
 </script>
