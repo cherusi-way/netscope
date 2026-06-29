@@ -6181,20 +6181,24 @@ setTimeout(checkForUpdate,45000);
   // ※ sw.js を別ファイルにすることでスコープがページと一致し、オフライン・更新が確実に機能する。
   if('serviceWorker' in navigator){
     window.addEventListener('load',()=>{
-      navigator.serviceWorker.register('sw.js').catch(()=>{});
+      navigator.serviceWorker.register('sw.js')
+        .then(reg=>{ console.log('[NetScope] Service Worker 登録成功 scope:',reg.scope); })
+        .catch(err=>{ console.error('[NetScope] Service Worker 登録失敗:',err); });
     });
   }
 
   // 3) インストール導線（ヘッダー常設ボタン + 下部バー + iOSヒント）
-  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   const isSafari=/Safari/.test(navigator.userAgent)&&!/Chrome|CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
   const inStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
   let deferred=null;
 
+  // 同一セッション内でインストール完了したかどうか（永続化しない＝アンインストール後に詰まらない）
+  let installedThisSession=false;
   function isInstalledState(){
-    // スタンドアロン起動中、または過去にインストール済みを記録している場合は「導入済み」
-    if(inStandalone())return true;
-    try{return localStorage.getItem('netscope-installed')==='1';}catch{return false;}
+    // 「導入済み」と確実に言えるのは、アプリとして起動中（standalone）か、今インストールした直後のみ。
+    // ブラウザのタブでは判別できないため、常にインストール可能（CTA）にしておく。
+    return inStandalone()||installedThisSession;
   }
 
   function updateInstallButton(){
@@ -6204,7 +6208,7 @@ setTimeout(checkForUpdate,45000);
     const ico=btn.querySelector('.bi-ico');
     const txt=btn.querySelector('.bi-txt');
     if(isInstalledState()){
-      // すでにインストール済み → 「✓ インストール済み」表示（押しても再インストールしない）
+      // アプリとして起動中／インストール直後 → 「✓ インストール済み」表示
       btn.classList.add('installed');
       btn.title='インストール済み';
       btn.setAttribute('aria-label','インストール済み');
@@ -6220,9 +6224,9 @@ setTimeout(checkForUpdate,45000);
   }
 
   async function doInstall(){
-    // すでに導入済みなら確認メッセージのみ
-    if(isInstalledState()){
-      if(typeof toast==='function') toast('このアプリはすでにインストールされています');
+    // アプリとして起動中（standalone）は導入対象が無いので案内のみ
+    if(inStandalone()){
+      if(typeof toast==='function') toast('すでにアプリとして起動しています');
       return;
     }
     // ① ネイティブのインストールプロンプトが使える場合（Android Chrome / Edge / デスクトップChrome等）
@@ -6230,30 +6234,39 @@ setTimeout(checkForUpdate,45000);
       deferred.prompt();
       const choice=await deferred.userChoice.catch(()=>null);
       deferred=null;
-      document.getElementById('ibar').classList.remove('show');
-      if(choice&&choice.outcome==='accepted'){try{localStorage.setItem('netscope-installed','1');}catch{}}
+      const ib=document.getElementById('ibar');if(ib)ib.classList.remove('show');
+      if(choice&&choice.outcome==='accepted'){installedThisSession=true;}
       updateInstallButton();
       return;
     }
-    // ② iOS Safari はプロンプトAPIが無いため、手順シートを表示
+    // ② iOS / iPadOS はプロンプトAPIが無いため、手順シートを表示
     if(isIOS){
-      document.getElementById('ios-hint').classList.add('show');
+      const h=document.getElementById('ios-hint');if(h)h.classList.add('show');
       return;
     }
-    // ③ それ以外（プロンプト未取得のブラウザ等）はメニュー操作を案内
-    if(typeof toast==='function') toast('ブラウザのメニューから「アプリをインストール」または「ホーム画面に追加」を選んでください');
+    // ③ プロンプト未取得（＝Chromeが条件未達と判断／既に導入済み／非対応）→ 原因を簡易診断して案内
+    let msg='Chromeのメニュー（⋮）から「アプリをインストール」を選んでください。表示されない場合は、すでにインストール済みの可能性があります';
+    try{
+      if('serviceWorker' in navigator){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(!reg){
+          msg='インストールの準備中です。一度ページを再読込してから、もう一度お試しください';
+        }else if(!navigator.serviceWorker.controller){
+          msg='初回読み込み直後のため準備中です。ページを再読込すると有効になります';
+        }
+      }
+    }catch(_){}
+    if(typeof toast==='function') toast(msg);
   }
 
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault();deferred=e;
-    // 再びインストール可能＝（アンインストール後など）未導入状態なので記録を消して同期
-    try{localStorage.removeItem('netscope-installed');}catch{}
+    installedThisSession=false; // インストール可能＝未導入
     updateInstallButton();
     setTimeout(()=>{const ib=document.getElementById('ibar');if(ib)ib.classList.add('show');},1200);
   });
   window.addEventListener('appinstalled',()=>{
-    deferred=null;
-    try{localStorage.setItem('netscope-installed','1');}catch{}
+    deferred=null;installedThisSession=true;
     const ib=document.getElementById('ibar');if(ib)ib.style.display='none';
     updateInstallButton(); // 「インストール済み」表示へ切替（ボタンは消さない）
   });
