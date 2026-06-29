@@ -9,7 +9,10 @@
 <meta name="apple-mobile-web-app-title" content="NetScope">
 <meta name="theme-color" content="#06090f">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>NetScope Pro</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -6165,66 +6168,13 @@ setTimeout(checkForUpdate,45000);
 
 // ── PWA INIT ─────────────────────────────────────────────────────
 (function initPWA(){
-  const ICON_B64='PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==';
-
-  // 1) Inject Web Manifest via Blob URL
-  const manifest={
-    name:'NetScope Pro',short_name:'NetScope',
-    description:'ネットワーク診断ツール',
-    start_url:location.href,
-    display:'standalone',
-    background_color:'#06090f',theme_color:'#06090f',
-    orientation:'portrait-primary',
-    icons:[{src:`data:image/svg+xml;base64,${ICON_B64}`,sizes:'any',type:'image/svg+xml',purpose:'any maskable'}]
-  };
-  const mBlob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  const mUrl=URL.createObjectURL(mBlob);
-  const mLink=document.createElement('link');
-  mLink.rel='manifest';mLink.href=mUrl;
-  document.head.appendChild(mLink);
-
-  // 2) Register Service Worker via Blob URL (caches the HTML for offline)
+  // manifest と アイコンは外部ファイル（manifest.json / icons/）として配置済み。
+  // ここでは Service Worker（同一オリジンの sw.js）を登録する。
+  // ※ sw.js を別ファイルにすることでスコープがページと一致し、オフライン・更新が確実に機能する。
   if('serviceWorker' in navigator){
-    const swCode=`
-const CACHE='netscope-v2';
-self.addEventListener('install',e=>{
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c=>c.add(self.registration.scope)).catch(()=>{}));
-});
-self.addEventListener('activate',e=>{
-  // 古いバージョンのキャッシュを削除してから制御を引き継ぐ
-  e.waitUntil((async()=>{
-    const keys=await caches.keys();
-    await Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)));
-    await clients.claim();
-  })());
-});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  const u=e.request.url;
-  // バージョンチェック要求は常にネットワークへ（キャッシュを介さず最新を取得）
-  if(u.includes('_vcheck='))return;
-  if(['api.ipify','api6.ipify','ipwho','ipapi.co','rdap','cloudflare','cloudflare-dns','dns.google','cdnjs','fonts.google','github','npmjs','google.com','tile.openstreetmap','openstreetmap.org'].some(s=>u.includes(s)))return;
-  // HTMLドキュメント（ナビゲーション）はネットワーク優先: オンライン時は常に最新版を取得し、
-  // 失敗時（オフライン）のみキャッシュにフォールバック。→ デプロイ更新が確実に反映される。
-  if(e.request.mode==='navigate'||e.request.destination==='document'){
-    e.respondWith(
-      fetch(e.request).then(res=>{
-        const copy=res.clone();
-        caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});
-        return res;
-      }).catch(()=>caches.open(CACHE).then(c=>c.match(e.request,{ignoreSearch:true})).then(r=>r||caches.match(self.registration.scope)))
-    );
-    return;
-  }
-  // その他のGETはキャッシュ優先（オフライン対応）
-  e.respondWith(caches.open(CACHE).then(c=>c.match(e.request)).then(r=>r||fetch(e.request).then(res=>{
-    caches.open(CACHE).then(c=>c.put(e.request,res.clone()));return res;
-  }).catch(()=>new Response('Offline',{status:503,headers:{'Content-Type':'text/plain'}}))));
-});`;
-    const swBlob=new Blob([swCode],{type:'application/javascript'});
-    const swUrl=URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
   }
 
   // 3) Android install prompt
@@ -6265,7 +6215,7 @@ self.addEventListener('fetch',e=>{
 </div>
 
 <div class="ibar" id="ibar">
-  <img class="ibar-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9Ijk2IiBmaWxsPSIjMDYwOTBmIi8+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjM2I5ZWZmIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMjJkM2E1Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3QgeD0iMTI4IiB5PSIzMDQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9InVybCgjYSkiIG9wYWNpdHk9Ii4zNSIvPjxyZWN0IHg9IjE4NCIgeT0iMjU2IiB3aWR0aD0iNDAiIGhlaWdodD0iMTI4IiByeD0iOCIgZmlsbD0idXJsKCNhKSIgb3BhY2l0eT0iLjU1Ii8+PHJlY3QgeD0iMjQwIiB5PSIyMDAiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxODQiIHJ4PSI4IiBmaWxsPSJ1cmwoI2EpIiBvcGFjaXR5PSIuNzUiLz48cmVjdCB4PSIyOTYiIHk9IjE0NCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjI0MCIgcng9IjgiIGZpbGw9InVybCgjYSkiLz48dGV4dCB4PSIyNTYiIHk9IjEwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI4MDAiIGZvbnQtc2l6ZT0iODAiIGZpbGw9InVybCgjYSkiPk5TPC90ZXh0Pjwvc3ZnPg==" alt="NS">
+  <img class="ibar-icon" src="icons/icon-192.png" alt="NetScope Pro">
   <div class="ibar-txt">
     <div class="ibar-ttl">ホーム画面に追加</div>
     <div class="ibar-sub">NetScope Pro をインストール</div>
